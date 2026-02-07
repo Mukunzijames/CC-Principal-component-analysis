@@ -16,7 +16,7 @@ This project demonstrates the application of Principal Component Analysis (PCA) 
 ## Dataset
 
 * **Name:** Cervical Cancer Risk Factors Dataset
-* **Source:** [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/383/cervical+cancer+risk+factors)
+* **Source:** [Hugging face data Machine Learning Repository](https://huggingface.co/datasets/electricsheepafrica/african-malaria-dataset)
 * **Description:** Contains medical and behavioral risk factors, as well as demographic information, related to cervical cancer. Includes numeric and categorical features, some with missing values.
 
 ---
@@ -65,7 +65,7 @@ from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 
 # Load dataset
-url = "https://archive.ics.uci.edu/ml/machine-learning-databases/00383/risk_factors_cervical_cancer.csv"
+url = "https://huggingface.co/datasets/electricsheepafrica/african-malaria-dataset/resolve/main/malaria_ssa_baseline_1000.csv"
 df = pd.read_csv(url)
 
 # Convert '?' to NaN and numeric columns
