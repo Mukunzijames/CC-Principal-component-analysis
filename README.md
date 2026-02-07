@@ -1,44 +1,39 @@
 
 ---
 
-# PCA Analysis of Cervical Cancer Risk Factors Dataset
+# PCA Analysis of African Malaria Synthetic Dataset
 
-**Python NumPy Pandas Matplotlib**
+**Python · NumPy · Pandas · Matplotlib · Seaborn · scikit-learn**
 
 ---
 
 ## Overview
 
-This project demonstrates the application of Principal Component Analysis (PCA) on the **Cervical Cancer Risk Factors Dataset** from the UCI Machine Learning Repository. PCA is a statistical technique used to emphasize variation and bring out strong patterns in a dataset. It helps in reducing the dimensionality of the data while retaining most of the variance, making it easier to visualize and analyze complex datasets.
+This project demonstrates **Principal Component Analysis (PCA)** applied to the **African Malaria Synthetic Dataset** (baseline, 1,000 observations) from Hugging Face. PCA is implemented from scratch to identify main patterns in malaria-related features in Sub-Saharan Africa. The notebook is a formative assignment in Advanced Linear Algebra, covering data loading, standardization, covariance-based PCA, explained variance analysis, and visualization.
 
 ---
 
 ## Dataset
 
-* **Name:** Cervical Cancer Risk Factors Dataset
-* **Source:** [Hugging face data Machine Learning Repository](https://huggingface.co/datasets/electricsheepafrica/african-malaria-dataset)
-* **Description:** Contains medical and behavioral risk factors, as well as demographic information, related to cervical cancer. Includes numeric and categorical features, some with missing values.
+* **Name:** African Malaria Synthetic Dataset – baseline sample (1,000 observations)
+* **Source:** [Hugging Face – electricsheepafrica/african-malaria-dataset](https://huggingface.co/datasets/electricsheepafrica/african-malaria-dataset)
+* **Description:** Synthetic dataset simulating demographic, clinical, and epidemiological features relevant to malaria in Sub-Saharan Africa. Includes age, sex, residence, season, fever, parasitemia, anemia, severe outcomes (e.g. cerebral malaria, respiratory distress), and malaria probability score. Contains numeric, categorical, and boolean variables, with some missing values (e.g. in `anemia_status`, `parasitemia_level`), making it suitable for preprocessing, dimensionality reduction, and PCA.
 
 ---
 
 ## Features
 
-* **Data Cleaning & Preprocessing:**
-  Handles missing values, encodes categorical variables, and ensures numeric features are ready for PCA.
-
-* **Data Standardization:**
-  Scales numeric features to mean 0 and variance 1 to avoid bias due to different feature ranges.
-
-* **PCA Computation:**
-  Computes covariance matrix, eigenvalues, and eigenvectors to determine principal components.
-
-* **Explained Variance Analysis:**
-  Calculates variance ratios and cumulative variance to quantify the amount of information retained by each principal component.
-
+* **Data loading & exploration:** Load CSV from Hugging Face, inspect shape, dtypes, and missing values.
+* **Data cleaning & preprocessing:** Handle missing values, encode categorical/boolean variables, and prepare numeric features for PCA.
+* **Standardization:** Scale numeric features to mean 0 and standard deviation 1 (formula-based implementation as in the assignment).
+* **PCA from scratch:** Compute covariance matrix, eigenvalues, and eigenvectors; sort components by explained variance.
+* **Explained variance analysis:** Variance ratio and cumulative variance per component; choice of number of components (e.g. 90% threshold).
 * **Visualization:**
-
-  * Cumulative explained variance curve
-  * Original vs PCA-reduced data scatter plots
+  * Cumulative explained variance curve (with threshold marker)
+  * Scatter: original feature space vs PCA-reduced (PC1 vs PC2)
+  * Bar chart of PC1 loadings (feature contributions to main pattern)
+  * Optional: scatter colored by PC1 score
+* **Validation:** Orthogonality of principal components (dot products ≈ 0); comparison with scikit-learn PCA (e.g. explained variance, PC1 correlation).
 
 ---
 
@@ -50,7 +45,7 @@ git clone https://github.com/Mukunzijames/CC-Principal-component-analysis.git
 cd CC-Principal-component-analysis
 
 # Install dependencies
-pip install numpy pandas matplotlib
+pip install numpy pandas matplotlib seaborn scikit-learn
 ```
 
 ---
@@ -64,34 +59,29 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 
-# Load dataset
+# Load African Malaria baseline dataset
 url = "https://huggingface.co/datasets/electricsheepafrica/african-malaria-dataset/resolve/main/malaria_ssa_baseline_1000.csv"
 df = pd.read_csv(url)
 
-# Convert '?' to NaN and numeric columns
-df.replace("?", np.nan, inplace=True)
-for col in df.columns:
-    df[col] = pd.to_numeric(df[col], errors='ignore')
+# Preprocess: select numeric columns, handle missing values
+numeric_cols = df.select_dtypes(include=[np.number]).columns
+df_numeric = df[numeric_cols].dropna(axis=0)
 
-# Drop rows with missing values (or handle them as needed)
-df_clean = df.dropna()
-
-# Standardize numeric features
+# Standardize
 scaler = StandardScaler()
-X_scaled = scaler.fit_transform(df_clean)
+X_scaled = scaler.fit_transform(df_numeric)
 
-# Apply PCA
-pca = PCA(n_components=2)  # Example: first 2 components
+# PCA (e.g. first 2 components)
+pca = PCA(n_components=2)
 X_pca = pca.fit_transform(X_scaled)
 
-# Explained variance
 print("Explained variance ratio:", pca.explained_variance_ratio_)
 
 # Plot PCA-reduced data
-plt.scatter(X_pca[:,0], X_pca[:,1])
+plt.scatter(X_pca[:, 0], X_pca[:, 1])
 plt.xlabel('PC1')
 plt.ylabel('PC2')
-plt.title('PCA of Cervical Cancer Risk Factors Dataset')
+plt.title('PCA of African Malaria Synthetic Dataset')
 plt.show()
 ```
 
@@ -99,24 +89,22 @@ plt.show()
 
 ## Usage
 
-1. Load the dataset using Pandas.
-2. Preprocess the data: handle missing values, encode categorical variables, and standardize numeric features.
-3. Apply PCA: compute covariance, eigenvalues/eigenvectors, and sort components by explained variance.
-4. Visualize results:
-
-   * Original vs PCA-reduced scatter plots
-   * Cumulative explained variance curve
-5. Analyze explained variance to decide how many components to retain for modeling or visualization.
+1. Open `Mukunzi_James_PCA_Formative_1.ipynb` and run cells in order.
+2. Load the dataset from the URL above; preprocess (handle missing values, encode categoricals, keep numeric features for PCA).
+3. Standardize numeric features (mean 0, std 1).
+4. Apply PCA from scratch: covariance matrix → eigenvalues/eigenvectors → sort by variance → project data.
+5. Visualize: cumulative variance curve, PC1 vs PC2 scatter, PC1 loadings bar chart.
+6. Use explained variance to decide how many components to retain (e.g. 90% cumulative variance).
 
 ---
 
-## Interpretation Example
+## Interpretation (from notebook)
 
-* **PC1:** captures 14.99% of total variance.
-* **PC2:** captures 9.89% variance, orthogonal to PC1.
-* **Cumulative variance:** guides how many components are needed to retain desired information (e.g., 90%).
+* **PC1** captures about **39.43%** of total variance and represents the dominant malaria risk/severity pattern (e.g. malaria probability score, parasitemia, fever, anemia-related features).
+* **PC2** captures about **22.80%** variance (orthogonal to PC1), reflecting secondary risk-factor combinations.
+* **Cumulative variance:** First two PCs explain ~**62.23%**; first three and five PCs capture higher cumulative shares. The cumulative curve guides how many components to keep for a desired retention (e.g. 90%).
 
-PCA reduces feature redundancy while highlighting the main patterns and relationships in the cervical cancer risk factors dataset.
+PCA reduces dimensionality and redundancy while highlighting the main patterns in the African malaria synthetic dataset.
 
 ---
 
